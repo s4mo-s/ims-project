@@ -7,24 +7,23 @@
  */
 
 #include <iostream>
-#include <cstdlib>
 #include <getopt.h>
 using namespace std;
 
 int main(int argc, char *argv[])
 {
-    double elePricePerYear = 350; // euro
-    int panelPricePer1kWh = 100; // euro
+    double elePriceFor1MWhPerYear = 350; // euro
+    int panelPriceFor1kWp = 2000; // euro
     double emissionProductionPerKWh = 133; // g
 
 
-    double panels;
-    int usage;
+    double panels = 0.0f;
+    double usage = 0.0f;
     int years = 1;
-    double profit = 0;
-    double energyWith = 0;
-    double energyWithout = 0;
-    double energySaved = 0;
+    double profit = 0.0f;
+    double energyWith = 0.0f;
+    double energyWithout = 0.0f;
+    double energySaved = 0.0f;
     bool energyCrisisChance;
     bool isCrisis = false;
     int numberOfCrisis = 0;
@@ -43,11 +42,11 @@ int main(int argc, char *argv[])
         switch (opt)
         {
             case 'u':
-                usage = stoi(optarg);
+                usage = stof(optarg);
                 break;
 
             case 'p':
-                panels = stoi(optarg);
+                panels = stof(optarg);
                 break;
 
             case 'y':
@@ -73,40 +72,40 @@ int main(int argc, char *argv[])
          << "-----------------------------------------------------------------------\n"
          << endl;
 
-    cout << "Panels bought for: " << panels * panelPricePer1kWh << "€" << endl;
-    profit -= panelPricePer1kWh * panels;
+    cout << "Panels bought for: " << panels * panelPriceFor1kWp << "€" << endl;
+    profit -= panelPriceFor1kWp * panels;
 
     for (int i = 1; i <= years; ++i) {
         cout << "------------------------------- YEAR " << i << " -------------------------------\n";
 
         if (isCrisis){
-            elePricePerYear -= abs(0.55*elePricePerYear);
+            elePriceFor1MWhPerYear -= abs(0.55*elePriceFor1MWhPerYear);
             isCrisis = false;
         }
 
         energyCrisisChance = (rand() % 100) < 3;
         if(energyCrisisChance){
-            elePricePerYear += abs(2.5*elePricePerYear);
+            elePriceFor1MWhPerYear += abs(2.5*elePriceFor1MWhPerYear);
             numberOfCrisis++;
             isCrisis = true;
         }
-        else {
-            profit += abs(elePricePerYear * (panels/1000));
-        }
-        elePricePerYear += 5;
+        profit += abs(elePriceFor1MWhPerYear * (panels));
+
+        elePriceFor1MWhPerYear += 5;
         energyWithout += usage;
-        energyWith += usage - panels/1000;
-        energySaved += panels/1000;
+        energyWith += usage - panels;
+        energySaved += panels;
 
         cout << "Spotreba energie:" << endl;
-        cout << "\tSpotreba elektrickej energie: " << energyWithout << "(MWh)" << endl;
-        cout << "\tSpotreba elektrickej energie so solárnym panelom: " << energyWith << "(MWh)" << endl;
-        cout << "\tUšetrená elektrická energia: " << energySaved << "(MWh)" << endl;
+        printf("\tSpotreba elektrickej energie: %.1f(MWh)\n", energyWithout);
+        printf("\tSpotreba elektrickej energie so solárnym panelom: %.1f(MWh)\n", energyWith);
+        printf("\tUšetrená elektrická energia: %.1f(MWh)\n", energySaved);
+
 
         cout << "Emisie:" << endl;
-        cout << "\tCO2 vyprodukované bez solárnehoho panelu: " << emissionProductionPerKWh * energyWithout << "(kg)" << endl;
-        cout << "\tCO2 vyprodukované so solárnym panelom: " << emissionProductionPerKWh * energyWith << "(kg)" << endl;
-        cout << "\tUšetrené škody na životnom prostredí: " << emissionProductionPerKWh * energySaved << "(kg)\n" << endl;
+        printf("\tCO2 vyprodukované bez solárneho panelu: %.1f(kg)\n", emissionProductionPerKWh * energyWithout);
+        printf("\tCO2 vyprodukované so solárneho panelu: %.1f(kg)\n", emissionProductionPerKWh * energyWith);
+        printf("\tUšetrené škody na životnom prostredí: %.1f(kg)\n", emissionProductionPerKWh * energySaved);
 
         cout << "Profit: " << profit << "€" << endl;
     }
