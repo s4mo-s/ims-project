@@ -1,6 +1,5 @@
 all:
-	g++ main.cpp -o main
+	g++ ims-project.cpp -o ims-project
 
 run:
-	./main
-
+	./ims-project $(ARGS)

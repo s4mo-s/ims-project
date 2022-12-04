@@ -15,17 +15,17 @@ int main(int argc, char *argv[])
     double elePriceFor1MWhPerYear = 350; // euro
     double panelPriceFor1kWp = 2000; // euro
 
-    double emissionCoalFiredPowerAndHeatingPlants = 820; // gCo2eq
-    double emissionGasPower = 490;
-    double emissionBiomassPower = 230;
-    double emissionNuclearPower = 12;
-    double emissionWaterPower = 24;
-    double emissionPhotovoltaicPower = 48;
-    double emissionWindPower = 11;
-    double emission = 0;
+    double emission;
+    double emissionCoalFiredPowerAndHeatingPlants = 820; // gram
+    double emissionGasPower = 490; // gram
+    double emissionBiomassPower = 230; // gram
+    double emissionNuclearPower = 12; // gram
+    double emissionWaterPower = 24; // gram
+    double emissionPhotovoltaicPower = 48; // gram
+    double emissionWindPower = 11; // gram
 
-    double panels = 0.0f;
     double usage = 0.0f;
+    double power = 0.0f;
     int years = 1;
     double profit = 0.0f;
     double energyWith = 0.0f;
@@ -36,11 +36,21 @@ int main(int argc, char *argv[])
     int numberOfCrisis = 0;
     srand(time(nullptr));
 
+    emission = emissionBiomassPower +
+               emissionCoalFiredPowerAndHeatingPlants +
+               emissionGasPower +
+               emissionNuclearPower +
+               emissionPhotovoltaicPower +
+               emissionWaterPower +
+               emissionWindPower;
+
+    emission = emission/7;
+
     int opt;
     const char *short_options = "u:p:y:";
     struct option long_options[] = {
             {"usage", required_argument, nullptr, 'u'},
-            {"panels", required_argument, nullptr, 'p'},
+            {"power", required_argument, nullptr, 'p'},
             {"years", required_argument, nullptr, 'y'},
             {nullptr, 0, nullptr, 0},
     };
@@ -53,7 +63,7 @@ int main(int argc, char *argv[])
                 break;
 
             case 'p':
-                panels = stof(optarg);
+                power = stof(optarg);
                 break;
 
             case 'y':
@@ -65,7 +75,7 @@ int main(int argc, char *argv[])
             default :
                 cerr << "Arguments: \n"
                      << "\t-u or --usage for average household consumption per year in (MWh)\n"
-                     << "\t-p or --panels \n"
+                     << "\t-p or --power \n"
                      << "\t-y or --years\n";
                 return EXIT_FAILURE;
         }
@@ -74,13 +84,13 @@ int main(int argc, char *argv[])
          << "SIMULATION START\n"
          << "-----------------------------------------------------------------------\n"
          << "Running with " << usage << "(MWh) average household consumption per year.\n"
-         << "Running with " << panels << "(kWh) panels.\n"
+         << "Running with " << power << "(kWp) power.\n"
          << "Running in range of " << years << " years.\n"
          << "-----------------------------------------------------------------------\n"
          << endl;
 
-    cout << "Panels bought for: " << panels * panelPriceFor1kWp << "€" << endl;
-    profit -= panelPriceFor1kWp * panels;
+    cout << "Panels bought for: " << power * panelPriceFor1kWp << "€" << endl;
+    profit -= panelPriceFor1kWp * power;
 
     for (int i = 1; i <= years; ++i) {
         cout << "------------------------------- YEAR " << i << " -------------------------------\n";
@@ -96,17 +106,12 @@ int main(int argc, char *argv[])
             numberOfCrisis++;
             isCrisis = true;
         }
-        profit += abs(elePriceFor1MWhPerYear * (panels));
+        profit += abs(elePriceFor1MWhPerYear * (power));
 
         elePriceFor1MWhPerYear += 5;
         energyWithout += usage;
-        energyWith += usage - panels;
-        energySaved += panels;
-
-        emission = emissionBiomassPower+emissionCoalFiredPowerAndHeatingPlants+emissionGasPower
-        +emissionNuclearPower+emissionPhotovoltaicPower+emissionWaterPower+emissionWindPower;
-
-        emission = emission/7;
+        energyWith += usage - power;
+        energySaved += power;
 
         cout << "Spotreba energie:" << endl;
         printf("\tSpotreba elektrickej energie: %.1f(MWh)\n", energyWithout);
