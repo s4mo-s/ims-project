@@ -15,7 +15,15 @@ int main(int argc, char *argv[])
 {
     double elePricePerYear = 350; // euro
     int panelPricePer1kWh = 100; // euro
-    double emissionProductionPerKWh = 133; // g
+    double emissionCoalFiredPowerAndHeatingPlants = 820; // gCo2eq
+    double emissionGasPower = 490;
+    double emissionBiomassPower = 230;
+    double emissionNuclearPower = 12;
+    double emissionWaterPower = 24;
+    double emissionPhotovoltaicPower = 48;
+    double emissionWindPower = 11;
+    double emission = 0;
+
 
 
     double panels;
@@ -98,15 +106,20 @@ int main(int argc, char *argv[])
         energyWith += usage - panels/1000;
         energySaved += panels/1000;
 
+        emission = emissionBiomassPower+emissionCoalFiredPowerAndHeatingPlants+emissionGasPower
+        +emissionNuclearPower+emissionPhotovoltaicPower+emissionWaterPower+emissionWindPower; 
+
+        emission = emission/7;
+
         cout << "Spotreba energie:" << endl;
         cout << "\tSpotreba elektrickej energie: " << energyWithout << "(MWh)" << endl;
         cout << "\tSpotreba elektrickej energie so solárnym panelom: " << energyWith << "(MWh)" << endl;
         cout << "\tUšetrená elektrická energia: " << energySaved << "(MWh)" << endl;
 
         cout << "Emisie:" << endl;
-        cout << "\tCO2 vyprodukované bez solárnehoho panelu: " << emissionProductionPerKWh * energyWithout << "(kg)" << endl;
-        cout << "\tCO2 vyprodukované so solárnym panelom: " << emissionProductionPerKWh * energyWith << "(kg)" << endl;
-        cout << "\tUšetrené škody na životnom prostredí: " << emissionProductionPerKWh * energySaved << "(kg)\n" << endl;
+        cout << "\tCO2 vyprodukované bez solárnehoho panelu: " << emission * energyWithout << "(kg)" << endl;
+        cout << "\tCO2 vyprodukované so solárnym panelom: " << emission * energyWith << "(kg)" << endl;
+        cout << "\tUšetrené škody na životnom prostredí: " << emission * energySaved << "(kg)\n" << endl;
 
         cout << "Profit: " << profit << "€" << endl;
     }
