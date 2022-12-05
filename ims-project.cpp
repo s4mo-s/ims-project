@@ -16,12 +16,13 @@ int main(int argc, char *argv[])
     double panelPriceFor1kWp = 2000; // euro
 
     double emission;
+    double emissionWithPV;
     double emissionCoalFiredPowerAndHeatingPlants = 820; // gram
     double emissionGasPower = 490; // gram
     double emissionBiomassPower = 230; // gram
-    double emissionNuclearPower = 12; // gram
-    double emissionWaterPower = 24; // gram
     double emissionPhotovoltaicPower = 48; // gram
+    double emissionWaterPower = 24; // gram
+    double emissionNuclearPower = 12; // gram
     double emissionWindPower = 11; // gram
 
     double usage = 0.0f;
@@ -40,11 +41,19 @@ int main(int argc, char *argv[])
                emissionCoalFiredPowerAndHeatingPlants +
                emissionGasPower +
                emissionNuclearPower +
-               emissionPhotovoltaicPower +
                emissionWaterPower +
                emissionWindPower;
 
-    emission = emission/7;
+    emissionWithPV = emissionBiomassPower +
+               emissionCoalFiredPowerAndHeatingPlants +
+               emissionGasPower +
+               emissionNuclearPower +
+               emissionWaterPower +
+               emissionWindPower +
+               emissionPhotovoltaicPower;
+
+    emission = emission/6;
+    emissionWithPV = emissionWithPV/7;
 
     int opt;
     const char *short_options = "u:p:y:";
@@ -59,15 +68,66 @@ int main(int argc, char *argv[])
         switch (opt)
         {
             case 'u':
-                usage = stof(optarg);
+                try {
+                    usage = stof(optarg);
+                }
+                catch(const invalid_argument)
+                {
+                    cerr << "Wrong input, usage must be number" << '\n';
+                    return EXIT_FAILURE;
+                }
+                catch(const out_of_range)
+                {
+                    cerr << "Integer overflow in usage" << '\n';
+                    return EXIT_FAILURE;
+                }
+                if(usage <= 0)
+                {
+                    cerr << "Usage can't be a negative number" << '\n';
+                    return EXIT_FAILURE;
+                }
                 break;
 
             case 'p':
-                power = stof(optarg);
+                try {
+                    power = stof(optarg);
+                }
+                catch(const invalid_argument)
+                {
+                    cerr << "Wrong input, power must be number" << '\n';
+                    return EXIT_FAILURE;
+                }
+                catch(const out_of_range)
+                {
+                    cerr << "Integer overflow in power" << '\n';
+                    return EXIT_FAILURE;
+                }
+                if(power <= 0)
+                {
+                    cerr << "Power can't be a negative number" << '\n';
+                    return EXIT_FAILURE;
+                }
                 break;
 
             case 'y':
-                years = stoi(optarg);
+                try {
+                    years = stoi(optarg);
+                }
+                catch(const invalid_argument)
+                {
+                    cerr << "Wrong input, years must be number" << '\n';
+                    return EXIT_FAILURE;
+                }
+                catch(const out_of_range)
+                {
+                    cerr << "Integer overflow in years" << '\n';
+                    return EXIT_FAILURE;
+                }
+                if(years <= 0)
+                {
+                    cerr << "Years can't be a negative number" << '\n';
+                    return EXIT_FAILURE;
+                }
                 break;
 
             case 'h':
@@ -93,14 +153,14 @@ int main(int argc, char *argv[])
     profit -= panelPriceFor1kWp * power;
 
     for (int i = 1; i <= years; ++i) {
-        cout << "------------------------------- YEAR " << i << " -------------------------------\n";
+        cout << "-------------------------------- YEAR " << i << " -------------------------------\n";
 
         if (isCrisis){
             elePriceFor1MWhPerYear -= abs(0.55*elePriceFor1MWhPerYear);
             isCrisis = false;
         }
 
-        energyCrisisChance = (rand() % 100) < 3;
+        energyCrisisChance = (rand() % 100) < 2;
         if(energyCrisisChance){
             elePriceFor1MWhPerYear += abs(2.5*elePriceFor1MWhPerYear);
             numberOfCrisis++;
@@ -121,7 +181,7 @@ int main(int argc, char *argv[])
 
         cout << "Emisie:" << endl;
         printf("\tCO2 vyprodukované bez solárneho panelu: %.1f(kg)\n", emission * energyWithout);
-        printf("\tCO2 vyprodukované so solárneho panelu: %.1f(kg)\n", emission * energyWith);
+        printf("\tCO2 vyprodukované so solárnym panelom: %.1f(kg)\n", emissionWithPV * energyWith);
         printf("\tUšetrené škody na životnom prostredí: %.1f(kg)\n", emission * energySaved);
 
         cout << "Profit: " << profit << "€" << endl;
