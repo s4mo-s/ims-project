@@ -134,9 +134,9 @@ int main(int argc, char *argv[])
             case '?':
             default :
                 cerr << "Arguments: \n"
-                     << "\t-u or --usage for average household consumption per year in (MWh)\n"
-                     << "\t-p or --power \n"
-                     << "\t-y or --years\n";
+                     << "\t-u or --usage for average household consumption per year in (MWh).\n"
+                     << "\t-p or --power for power of solar panels in (kWp).\n"
+                     << "\t-y or --years for range of simulation in years.\n";
                 return EXIT_FAILURE;
         }
 
